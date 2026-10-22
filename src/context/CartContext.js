@@ -7,12 +7,16 @@ const CartContext = createContext(null);
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState({ items: [], totalPrice: 0, totalItems: 0 });
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated()) fetchCart();
-    else setCart({ items: [], totalPrice: 0, totalItems: 0 });
-  }, [isAuthenticated()]);
+    if (user) {
+      fetchCart();
+    } else {
+      setCart({ items: [], totalPrice: 0, totalItems: 0 });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const fetchCart = async () => {
     try {
@@ -47,7 +51,7 @@ export const CartProvider = ({ children }) => {
     setCart({ items: [], totalPrice: 0, totalItems: 0 });
   };
 
-  const cartCount = cart?.totalItems || 0;
+  const cartCount = cart?.totalItems || cart?.items?.length || 0;
 
   return (
     <CartContext.Provider value={{ cart, loading, fetchCart, addToCart, updateItem, removeItem, clearCart, cartCount }}>
